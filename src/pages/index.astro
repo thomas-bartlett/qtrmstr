@@ -1,0 +1,170 @@
+---
+import Icon from "../components/Icon.astro";
+import CrewStep from "../components/CrewStep.astro";
+import ExpensesStep from "../components/ExpensesStep.astro";
+import SettlementStep from "../components/SettlementStep.astro";
+import JollyRoger from "../components/JollyRoger.astro";
+import paper from "../assets/scroll-paper.webp?url";
+import "../styles/global.css";
+import "../styles/print.css";
+
+const base = import.meta.env.BASE_URL;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Split a trip’s expenses, see who owes whom, and export the calculations. A simple calculator that runs in your browser."
+    />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="theme-color" content="#16798b" />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <link rel="preload" as="image" href={paper} />
+    <title>Quartermaster · Trip expenses</title>
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Skip to trip</a>
+    <div class="app-shell">
+      <img
+        src={`${base}art/sea-chart-v2-1536.webp`}
+        srcset={`${base}art/sea-chart-v2-768.webp 768w, ${base}art/sea-chart-v2-1536.webp 1536w`}
+        sizes="(max-aspect-ratio: 3/2) 150vh, 100vw"
+        width="1536"
+        height="1024"
+        alt=""
+        class="sea-background"
+        decoding="async"
+        fetchpriority="high"
+      />
+      <aside id="storage-notice" class="storage-notice notice" role="status" hidden>
+        <p id="storage-message"></p>
+        <button type="button" id="reload-draft" class="text-button" hidden>
+          Reload saved trip
+        </button>
+      </aside>
+      <main id="main" tabindex="-1">
+        <section
+          id="trip-ledger"
+          class="calculator scroll-sheet"
+          aria-labelledby="page-title"
+        >
+          <header class="app-header">
+            <h1 class="scroll-heading">
+              <JollyRoger size={32} /><span>quartermaster</span>
+            </h1>
+            <button type="button" id="reset-trip" class="text-button reset-button">
+              Reset trip
+            </button>
+          </header>
+          <nav aria-label="Trip steps" class="step-nav">
+            {["Crew", "Ship’s tab", "Settle up"].map((label, step) => (
+              <button
+                type="button"
+                class={`step-link${step === 0 ? " active" : ""}`}
+                data-step={step}
+                aria-current={step === 0 ? "step" : undefined}
+              >
+                <span class="route-stop" aria-hidden="true">
+                  <span class="route-cross">×</span>
+                  <Icon name="boat" size={25} class="route-ship" />
+                </span>
+                <span>{label}</span>
+              </button>
+            ))}
+          </nav>
+          <div class="calculator-body">
+            <noscript>
+              <p class="notice">
+                Enable JavaScript to calculate your trip costs. Your details stay in this browser.
+              </p>
+            </noscript>
+            <p id="notice" class="notice" role="status" hidden></p>
+            <div class="page-heading">
+              <h2 id="page-title" class="page-title" tabindex="-1">All aboard</h2>
+              <div id="trip-tally" class="trip-tally" hidden>
+                <span>Total <span id="summary-currency">USD</span></span>
+                <strong id="summary-total">$0.00</strong>
+              </div>
+            </div>
+
+            <CrewStep />
+
+            <ExpensesStep />
+
+            <SettlementStep />
+          </div>
+          <footer class="utility-row">
+            <details class="privacy-note">
+              <summary><Icon name="lock" size={13} /><span id="save-status">Local browser draft</span></summary>
+              <p>
+                One trip is saved in this browser on this device. Nothing is uploaded.
+                Drafts aren’t encrypted: anyone using this browser profile, or other apps
+                hosted on this same domain, can access them. Reset trip clears the draft;
+                PDF and CSV exports keep a separate copy.
+              </p>
+            </details>
+            <button type="button" class="text-button example-button" id="example-trip">
+              Try example
+            </button>
+          </footer>
+          <div id="toast" class="toast" role="status" hidden></div>
+        </section>
+      </main>
+    </div>
+
+    <section id="print-report" class="print-report" aria-label="Printable trip settlement">
+      <div id="print-content"></div>
+    </section>
+    <dialog
+      id="confirm-dialog"
+      class="scroll-sheet"
+      aria-labelledby="confirm-title"
+      aria-describedby="confirm-message"
+    >
+      <div class="confirm-content">
+        <Icon name="piece" size={26} />
+        <h2 id="confirm-title">Reset this trip?</h2>
+        <p id="confirm-message"></p>
+        <div class="form-actions">
+          <button type="button" class="button button-secondary" id="confirm-cancel" autofocus>
+            Keep trip
+          </button>
+          <button type="button" class="button button-primary" id="confirm-accept">
+            Reset trip
+          </button>
+        </div>
+      </div>
+    </dialog>
+    <dialog
+      id="import-dialog"
+      class="scroll-sheet"
+      aria-labelledby="import-title"
+      aria-describedby="import-summary"
+    >
+      <div class="confirm-content">
+        <Icon name="boat" size={30} />
+        <h2 id="import-title">Bring this voyage aboard?</h2>
+        <p id="import-summary"></p>
+        <ul id="import-preview" class="import-preview"></ul>
+        <p class="field-hint">
+          This replaces the trip you’re working on. Export your current trip first if you want to keep it.
+        </p>
+        <div class="form-actions">
+          <button type="button" id="import-cancel" class="button button-secondary" autofocus>
+            Cancel
+          </button>
+          <button type="button" id="import-accept" class="button button-primary">
+            Use this trip
+          </button>
+        </div>
+      </div>
+    </dialog>
+    <script>
+      import "../scripts/quartermaster";
+    </script>
+  </body>
+</html>

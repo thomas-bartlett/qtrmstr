@@ -1,0 +1,201 @@
+---
+import Icon from "./Icon.astro";
+import { CATEGORIES } from "../lib/trip";
+import { CATEGORY_THEME } from "../lib/theme";
+---
+
+<section id="step-1" class="step-panel" aria-label="Ship’s tab" hidden>
+  <form id="expense-form" aria-label="Log a trip cost">
+    <p id="expense-editing" class="editing-note" role="status" hidden>
+      Editing this cost
+    </p>
+    <fieldset class="category-fieldset">
+      <legend>What’s it for?</legend>
+      <div class="category-choices">
+        {Object.entries(CATEGORY_THEME).map(([value, theme]) => (
+          <label class={`category-choice category-${value}`}>
+            <input
+              type="radio"
+              name="category"
+              value={value}
+              checked={value === "stays"}
+            />
+            <span class="category-art"><Icon name={theme.icon} size={30} /></span>
+            <strong>{theme.name}</strong>
+            <small>{CATEGORIES[value as keyof typeof CATEGORIES]}</small>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+    <div class="field description-field">
+      <label for="expense-name">What did we get?</label>
+      <input
+        id="expense-name"
+        placeholder="e.g. The harbor house"
+        maxlength="100"
+        required
+      />
+    </div>
+    <label class="itemize-toggle">
+      <input
+        id="itemize-receipt"
+        type="checkbox"
+        aria-controls="receipt-fields simple-cost-fields"
+      /> Itemize this receipt
+    </label>
+    <fieldset id="simple-cost-fields" class="simple-cost-fields">
+      <legend class="sr-only">Amount and split</legend>
+      <div class="amount-entry">
+        <Icon name="piece" size={36} />
+        <div class="field">
+          <label for="expense-amount">
+            How much? <span id="amount-currency">USD</span>
+          </label>
+          <input
+            id="expense-amount"
+            aria-label="Expense amount"
+            inputmode="decimal"
+            placeholder="0.00"
+            maxlength="12"
+            autocomplete="off"
+            required
+          />
+        </div>
+      </div>
+      <fieldset>
+        <legend>Who shares the cost?</legend>
+        <p class="field-hint">
+          Split evenly between the selected shipmates, or pick just one.
+        </p>
+        <div class="participants-heading">
+          <button
+            type="button"
+            class="text-button"
+            id="select-all"
+            aria-label="Select the whole crew"
+          >
+            Whole crew
+          </button>
+          <button type="button" class="text-button" id="clear-participants">
+            Clear
+          </button>
+        </div>
+        <div id="participants" class="participants"></div>
+      </fieldset>
+    </fieldset>
+    <fieldset id="receipt-fields" hidden disabled>
+      <legend>Receipt items</legend>
+      <div id="receipt-items" class="receipt-items"></div>
+      <button type="button" id="add-receipt-item" class="text-button">
+        <Icon name="plus" size={16} /> Add an item
+      </button>
+      <div class="receipt-extras">
+        <label class="field">
+          Tax<input
+            id="receipt-tax"
+            inputmode="decimal"
+            maxlength="12"
+            placeholder="0.00"
+            autocomplete="off"
+          />
+        </label>
+        <label class="field">
+          Tip<input
+            id="receipt-tip"
+            inputmode="decimal"
+            maxlength="12"
+            placeholder="0.00"
+            autocomplete="off"
+          />
+        </label>
+      </div>
+      <p class="field-hint">
+        Enter tax and tip amounts from the receipt. Each is split in proportion
+        to each shipmate’s item subtotal.
+      </p>
+    </fieldset>
+    <p id="split-status" class="sr-only" role="status" aria-atomic="true"></p>
+    <div id="split-preview" class="split-preview" hidden>
+      <p class="split-total">Total <output id="split-total">—</output></p>
+      <dl
+        id="split-shares"
+        class="cost-shares"
+        aria-label="Cost per shipmate"
+      ></dl>
+      <p id="split-hint" class="field-hint" role="status" hidden></p>
+    </div>
+    <fieldset>
+      <legend>Who paid?</legend>
+      <div id="expense-payers" class="people-choices"></div>
+    </fieldset>
+    <details id="date-details" class="date-details">
+      <summary>Add a date</summary>
+      <div class="field">
+        <label for="expense-date">Date</label>
+        <input id="expense-date" type="date" />
+      </div>
+    </details>
+    <p class="form-error" id="expense-error" role="alert" hidden></p>
+    <div class="form-actions">
+      <button type="button" id="cancel-edit" class="button button-quiet" hidden>
+        Cancel edit
+      </button>
+      <button type="submit" class="button button-primary" id="save-expense">
+        <Icon name="plus" size={18} /> Log this cost
+      </button>
+    </div>
+  </form>
+  <template id="receipt-item-template">
+    <fieldset class="receipt-item">
+      <legend class="receipt-item-number"></legend>
+      <div class="receipt-item-fields">
+        <label class="field">
+          Item<input
+            class="receipt-item-name"
+            maxlength="100"
+            placeholder="e.g. Fish & chips"
+            required
+          />
+        </label>
+        <label class="field">
+          Amount<input
+            class="receipt-item-amount"
+            inputmode="decimal"
+            maxlength="12"
+            placeholder="0.00"
+            autocomplete="off"
+            required
+          />
+        </label>
+      </div>
+      <fieldset>
+        <legend>Who shares this item?</legend>
+        <div class="participants-heading">
+          <button type="button" class="text-button item-everyone">Whole crew</button>
+          <button type="button" class="text-button item-clear">Clear</button>
+        </div>
+        <div class="participants"></div>
+      </fieldset>
+      <button type="button" class="text-button text-danger remove-receipt-item">
+        Remove item
+      </button>
+    </fieldset>
+  </template>
+  <section class="ledger-section" aria-labelledby="ledger-title">
+    <div class="section-heading">
+      <Icon name="chest" size={25} />
+      <h2 id="ledger-title">On the tab</h2>
+      <span id="expense-count" class="count-tag">0</span>
+    </div>
+    <div id="expense-list"></div>
+    <p id="expenses-empty" class="empty-state">The tab is empty.</p>
+  </section>
+  <div class="step-footer">
+    <button type="button" class="text-button" data-step="0">
+      <span aria-hidden="true">←</span> Crew
+    </button>
+    <button type="button" class="button button-primary" data-step="2">
+      Settle up <span aria-hidden="true">→</span>
+    </button>
+  </div>
+</section>

@@ -1,0 +1,32 @@
+{
+  "name": "quartermaster",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "24.22.1",
+      "onFail": "error"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": "11.21.1",
+      "onFail": "error"
+    }
+  },
+  "scripts": {
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
+    "check": "ASTRO_TELEMETRY_DISABLED=1 astro check && tsc --project tests/tsconfig.json",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
+    "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview",
+    "test": "node --test tests/*_test.ts",
+    "audit": "npm audit --audit-level=low --include=dev"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@types/node": "24.19.2",
+    "astro": "7.3.5",
+    "typescript": "6.0.3"
+  }
+}

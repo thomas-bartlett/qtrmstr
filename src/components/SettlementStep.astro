@@ -1,0 +1,60 @@
+---
+import Icon from "./Icon.astro";
+---
+
+<section id="step-2" class="step-panel" aria-label="Settlement" hidden>
+  <section aria-labelledby="settlement-title">
+    <h2 id="settlement-title" class="sr-only">Who pays whom</h2>
+    <p id="settlement-description" class="field-hint"></p>
+    <div id="transfers" class="transfers"></div>
+    <p class="field-hint">Make these payments with your usual payment app or cash.</p>
+  </section>
+  <details id="crew-balances" class="balance-section">
+    <summary><Icon name="crew" size={20} /> Show balances</summary>
+    <p id="group-settlement-note" class="field-hint" hidden>
+      Groups settle together. Their payments cover everyone listed in the group.
+    </p>
+    <div id="balance-cards" class="balance-cards"></div>
+    <details id="individual-balances" class="calculation-note" hidden>
+      <summary>Each shipmate’s share</summary>
+      <p class="field-hint">
+        These individual balances are already included in the payments above.
+      </p>
+      <div id="member-balance-cards" class="balance-cards"></div>
+    </details>
+    <details class="calculation-note">
+      <summary>Show the workings</summary>
+      <p>
+        Each person’s balance is what they paid minus their share. Groups combine
+        those balances to settle together; adding or changing a group never changes
+        a saved cost’s split. Payments settle those totals, so you may pay someone
+        other than the original payer. Items split evenly among the selected people.
+        Receipt tax and tip follow each person’s item subtotal; extra pennies go to
+        the largest fractional remainders, with recorded order breaking ties.
+        Open a cost to see the exact shares.
+      </p>
+    </details>
+  </details>
+  <div class="export-section">
+    <div class="export-actions">
+      <button type="button" class="button button-primary" id="export-pdf">
+        <Icon name="print" size={17} /> Save PDF
+      </button>
+      <button type="button" class="button button-secondary" id="export-csv">
+        <Icon name="download" size={17} /> Download CSV
+      </button>
+    </div>
+    <label class="export-detail">
+      <input id="pdf-details" type="checkbox" /> Include receipt &amp; split details in PDF
+    </label>
+    <p class="field-hint">Choose “Save as PDF” in the print dialog.</p>
+    <p class="field-hint">
+      Share the CSV and this site’s link. Your crew can import their own copy of the trip.
+    </p>
+  </div>
+  <div class="step-footer">
+    <button type="button" class="text-button" data-step="1">
+      <span aria-hidden="true">←</span> Ship’s tab
+    </button>
+  </div>
+</section>

@@ -1,0 +1,82 @@
+Quartermaster CSV guide
+
+Start from quartermaster-template.csv or Download CSV. Replace the sample data
+with known facts; do not invent missing information. Share the file and website
+link: Crew > Import CSV loads an independent copy. Changes do not sync.
+
+File format
+
+Use UTF-8. Keep the version row, table headings, and column order. Quote cells
+containing commas or quotes, and double any quotes inside them. Blank rows are OK.
+Start with:
+Quartermaster CSV,1
+Quartermaster trip,Your trip name
+Currency,USD
+
+IDs link the tables. Use unique crew IDs (p1, p2, etc.) and cost IDs (e1, e2, etc.).
+Update their references if changed. Amounts are decimals with at most two decimal
+places: no currency symbols, thousands separators, percentages, or formulas.
+
+Source tables
+
+Keep these exact headings and columns:
+
+CREW
+ID,Name
+- One row per person, including anyone with no costs. Names must be distinct
+  and 1–40 characters long.
+
+SETTLEMENT GROUPS
+Group,Member IDs
+- Optional. In Member IDs, list at least two crew IDs separated by | (p1|p2).
+  Each person can join one group. Group names are derived from member names.
+
+EXPENSES
+Expense,Date,Category,Paid by,Amount,Split,ID,Split with (crew IDs)
+- Expense: a description of 1–100 characters.
+- Date: YYYY-MM-DD or blank.
+- Category: stays, meals, transport, activities, groceries, or other.
+- Paid by: an exact CREW name; update it when renaming someone. The payer need
+  not share the cost.
+- Amount: positive. Split: even, individual (one person), or itemized (receipt).
+- Split with: crew IDs separated by |. Their order breaks rounding ties.
+
+RECEIPT DETAILS — already included in expense totals above
+Receipt,Item / extra,Amount,Expense ID,Type,Split with (crew IDs)
+- Required for itemized costs. Expense ID links to the cost's ID in EXPENSES.
+- Type item: a name (1–100 characters), positive amount, and one or more crew IDs.
+- Type tax and tip: exactly one row of each per receipt. Use monetary amounts,
+  0.00 for none, and leave Split with empty.
+- Import recalculates receipt totals and participants from these details.
+
+Member share columns, TOTAL, and balance/payment tables are calculated output;
+you can omit them when preparing a file. Import and download again to refresh them.
+
+Calculations
+
+- Total cost: sum EXPENSES rows, excluding TOTAL. Receipt details are already
+  included; do not count them twice.
+- For each person, sum their allocated cost shares. Balance = paid minus share.
+  Positive receives; negative owes.
+- Ordinary costs and receipt items split evenly among their listed people.
+  Extra pennies follow participant order.
+- Tax/tip share = extra × person's allocated item subtotal ÷ receipt item subtotal.
+  Round down to cents, then give remaining pennies to the largest fractional
+  remainders. Ties follow first appearance in item participant lists.
+- Groups combine individual balances for settlement. Suggested payments describe
+  how to settle; the app does not send or track payments.
+
+Limits and safety
+
+- Trip name: up to 80 characters. One currency: USD, EUR, GBP, CAD, AUD, NZD,
+  CHF, INR, or SGD. Convert foreign costs first.
+- Maximum: 50 people, 100 items per receipt, 1,000 costs/items combined,
+  999999999.99 per cost/receipt including extras, and 8,000,000 bytes per file.
+- Names and descriptions cannot contain line breaks or control characters.
+- Prefix text with an apostrophe if it starts with an apostrophe, or with
+  =, +, -, @ (including full-width forms) after optional whitespace. Keep existing
+  export prefixes; import decodes them.
+- Spreadsheet apps may strip escaping when saving. Keep the original export
+  and load untrusted cells as text when opening them in a spreadsheet.
+- Quartermaster never executes imported formulas or code. Imports are checked
+  locally and previewed; review the people and amounts before replacing a trip.

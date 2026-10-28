@@ -1,0 +1,118 @@
+---
+import Icon from "./Icon.astro";
+import { CURRENCIES } from "../lib/trip";
+
+const base = import.meta.env.BASE_URL;
+---
+
+<section id="step-0" class="step-panel" aria-label="Trip and crew">
+  <div class="field voyage-field">
+    <label for="trip-name">Where to, captain?</label>
+    <input
+      id="trip-name"
+      aria-label="Trip name"
+      placeholder="e.g. Tortuga weekend"
+      maxlength="80"
+      autocomplete="off"
+      required
+    />
+  </div>
+  <div class="currency-field">
+    <label for="currency">Counting in</label>
+    <select id="currency" aria-describedby="currency-hint">
+      {Object.entries(CURRENCIES).map(([code, name]) => (
+        <option value={code}>{code} · {name}</option>
+      ))}
+    </select>
+  </div>
+  <p class="field-hint" id="currency-hint">
+    Convert foreign costs to your trip’s currency first.
+  </p>
+
+  <section class="crew-section" aria-labelledby="crew-title">
+    <div class="section-heading">
+      <h2 id="crew-title">Who's coming aboard?</h2>
+      <span class="count-tag" id="crew-count">0</span>
+    </div>
+    <form id="member-form" class="member-form">
+      <div class="field">
+        <label for="member-name" class="sr-only">Shipmate’s name</label>
+        <input
+          id="member-name"
+          placeholder="Name"
+          maxlength="40"
+          autocomplete="off"
+          required
+        />
+      </div>
+      <button class="button button-secondary" type="submit">
+        <Icon name="plus" size={18} />Add mate
+      </button>
+    </form>
+    <p class="form-error" id="member-error" role="alert" hidden></p>
+    <div id="crew-list" class="crew-list"></div>
+    <p id="crew-empty" class="empty-state">Bring at least two shipmates aboard.</p>
+    <details id="groups-section" class="groups-section">
+      <summary>Settle together</summary>
+      <p id="group-hint" class="field-hint">
+        Each person gets a share; a couple or group can settle together.
+        Group names use the shipmates’ names, like Alex &amp; Jamie.
+      </p>
+      <div id="group-list" class="group-list"></div>
+      <form
+        id="group-form"
+        aria-label="Create or edit a settlement group"
+        aria-describedby="group-hint"
+      >
+        <fieldset>
+          <legend>Who’s settling together?</legend>
+          <p class="field-hint">
+            Choose at least two. Each shipmate can belong to one group.
+          </p>
+          <div id="group-people" class="participants"></div>
+        </fieldset>
+        <p id="group-error" class="form-error" role="alert" hidden></p>
+        <div class="form-actions">
+          <button
+            type="button"
+            id="cancel-group-edit"
+            class="button button-quiet"
+            hidden
+          >
+            Cancel edit
+          </button>
+          <button type="submit" id="save-group" class="button button-secondary">
+            Create group
+          </button>
+        </div>
+      </form>
+      <p id="group-empty" class="field-hint" hidden>
+        Add at least two ungrouped shipmates to make a group.
+      </p>
+    </details>
+  </section>
+  <details class="import-section">
+    <summary>Import CSV</summary>
+    <p>
+      Load a Quartermaster CSV. The template uses the same format as your download.
+      Preview before replacing your trip.
+    </p>
+    <div class="import-actions">
+      <label class="button button-secondary file-picker">
+        Choose CSV<input id="import-csv" type="file" accept=".csv,text/csv" />
+      </label>
+      <a class="text-button" href={`${base}quartermaster-template.csv`} download>
+        CSV template
+      </a>
+    </div>
+    <a class="text-button" href={`${base}quartermaster-csv-guide.txt`} download>
+      CSV guide
+    </a>
+    <p id="import-error" class="form-error" role="alert" hidden></p>
+  </details>
+  <div class="step-footer">
+    <button type="button" class="button button-primary" data-step="1">
+      Ship’s tab <span aria-hidden="true">→</span>
+    </button>
+  </div>
+</section>
